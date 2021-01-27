@@ -393,11 +393,15 @@ ndidCallbackEvent.on('callback', (data) => {
       }
     }
   } else if (data.type === 'incoming_request') {
-    const user = db.getUserByReferenceGroupCode(data.reference_group_code);
+    let user = db.getUserByReferenceGroupCode(data.reference_group_code);
     if (!user) {
-      createErrorResponse(data.request_id, 10101);
-      return;
+      user = db.getUserByIdentifier(data.namespace, data.identifier)
+      if (!user) {
+        createErrorResponse(data.request_id, 10101);
+        return;
+      }
     }
+    console.log(data)
     db.saveRequest(user.id, data);
   } else if (data.type === 'error') {
     // TODO: callback when using async createRequest and got error
